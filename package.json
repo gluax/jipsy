@@ -1,0 +1,21 @@
+{
+  "name": "jipsy",
+  "version": "1.0.0",
+  "description": "A small lisp interpreter written in javascript",
+  "main": "jipsy-cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lisp",
+    "interpreter",
+    "js",
+    "node",
+    "es6"
+  ],
+  "author": "Jonathan Pavlik",
+  "license": "ISC",
+  "dependencies": {
+    "repl": "^0.1.3"
+  }
+}
