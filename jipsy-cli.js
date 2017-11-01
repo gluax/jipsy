@@ -1,5 +1,5 @@
-let repl = require('repl');
-let jipsy = require('./jipsy');
+const repl = require('repl');
+const jipsy = require('./jipsy');
 
 repl.start({
   prompt:"jipsy> ",
