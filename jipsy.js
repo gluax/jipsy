@@ -1,5 +1,15 @@
+/* @file jipsy.js
+ * @author Jonathan Pavlik
+ *
+ */
 const library = {
-  first: (list) => {
+  /*
+   * @function first
+   * @param {identifier[]} list - A list of identifiable types.
+   *
+   * @return {identifier} the first element of a list.
+   */
+  first: function (list) {
     //gets first item of list
     
     if(!(list instanceof Array)) {
@@ -8,8 +18,14 @@ const library = {
     
     return list[0];
   },
-  
-  rest: (list) => {
+
+  /*
+   * @function rest
+   * @param {identifier[]} list - A list of identifiable types.
+   *
+   * @return {identifier[]} the rest of a list.
+   */
+  rest: function (list) {
     //cuts of the first element of the list
 
     if(!(list instanceof Array)) {
@@ -18,8 +34,14 @@ const library = {
     
     return list.slice(1);
   },
-  
-  print: (param) => {
+
+  /*
+   * @function print
+   * @param {identifier} the type to be printed.
+   *
+   * @return {identifier} they type being printed.
+   */
+  print: function (param) {
     //prints the argument and returns it
     
     console.log(param);
@@ -27,16 +49,26 @@ const library = {
   }
 };
 
+//for storing user written functions and their logic
 let written_funcs = {};
 let written_funcs_logic = {};
 
+//for storing all lisp functions
 const lisp_functions = {
-  '+': (input, context) => {
+  /*
+   * @function +
+   * Adds all numbers in a list
+   * @param {identifier[]} input - A list of identifiable types, presumably numbers.
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {identifer} with a type of number.
+   */
+  '+': function (input, context) {
     let nums = input.splice(1);
     
     nums.forEach((part, pos) => {
       if(part instanceof Array) {
-        nums[pos].value = interpret(part, context);
+        nums[pos].value = interpret(part, context); 
       }
     });
     
@@ -48,7 +80,15 @@ const lisp_functions = {
     return interpret(answer, context);
   },
 
-  '-': (input, context) => {
+  /*
+   * @function -
+   * Subtracts all numbers in a list
+   * @param {identifier[]} input - A list of identifiable types, presumably numbers.
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {identifer} with a type of number.
+   */
+  '-': function (input, context) {
     let nums = input.splice(2);
     
     nums.forEach((part, pos) => {
@@ -65,7 +105,15 @@ const lisp_functions = {
     return interpret(answer, context);
   },
 
-  '*': (input, context) => {
+  /*
+   * @function *
+   * Multiplies all numbers in a list
+   * @param {identifier[]} input - A list of identifiable types, presumably numbers.
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {identifer} with a type of number.
+   */
+  '*': function (input, context) {
     let nums = input.splice(2);
     
     nums.forEach((part, pos) => {
@@ -82,6 +130,14 @@ const lisp_functions = {
     return interpret(answer, context);
   },
 
+  /*
+   * @function /
+   * Divides all numbers in a list
+   * @param {identifier[]} input - A list of identifiable types, presumably numbers.
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {identifer} with a type of number.
+   */
   '/': (input, context) => {
     let nums = input.splice(2);
 
@@ -99,6 +155,14 @@ const lisp_functions = {
     return interpret(answer, context);
   },
 
+  /*
+   * @function %
+   * Modulos all numbers in a list
+   * @param {identifier[]} input - A list of identifiable types, presumably numbers.
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {identifer} with a type of number.
+   */
   '%': (input, context) => {
     let nums = input.splice(2);
 
@@ -116,7 +180,15 @@ const lisp_functions = {
     return interpret(answer, context);
   },
 
-  defun: (input, context) => {
+  /*
+   * @function defun
+   * let's the user define a function
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {string} an error message if there is an error with the syntax.
+   */
+  defun: function (input, context) {
     const func = input[1].value;
     const args = input[2];
     const logic = input[3];
@@ -145,26 +217,142 @@ const lisp_functions = {
     }
     
   },
-  
-  lambda: (input, context) => {
-    return function() {
-        var args = arguments;
-        var scope = input[1].reduce((acc, cur, pos) => {
-          acc[cur.value] = args[pos];
-          return acc;
-        }, {});
 
-        return interpret(input[2], new Context(scope, context));
-      };
-  },
-
-  if: (input, context) => {
+  /*
+   * @function if
+   * provides if logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} the code that will be run.
+   */
+  if: function (input, context) {
     return interpret(input[1], context) ?
       interpret(input[2], context) :
       interpret(input[3], context);
   },
-  
-  let: (input, context) => {
+
+  /*
+   * @function eq
+   * provides equal logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} whether two things are equal
+   */
+  eq: function (input, context) {
+    let args = input.splice(1);
+    
+    if(args.length > 2) {
+      return `Error: can not compare more than 2 args and recieved ${args.length}`;
+    }
+    
+    let answer = {type: 'boolean'};
+    answer.value = interpret(args[0], context) === interpret(args[1], context);
+    return interpret(answer, context);
+  },
+
+  /*
+   * @function neq
+   * provides not equal logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} whether two things are not equal
+   */
+  neq: function (input, context) {
+    let args = input.splice(1);
+    
+    if(args.length > 2) {
+      return `Error: can not compare more than 2 args and recieved ${args.length}`;
+    }
+    
+    let answer = {type: 'boolean'};
+    answer.value = interpret(args[0], context) !== interpret(args[1], context);
+    return interpret(answer, context);
+  },
+
+  /*
+   * @function lt
+   * provides less than logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} whether one thing is less than another
+   */
+  lt: function (input, context) {
+    let args = input.splice(1);
+    
+    if(args.length > 2) {
+      return `Error: can not compare more than 2 args and recieved ${args.length}`;
+    }
+    
+    let answer = {type: 'boolean'};
+    answer.value = interpret(args[0], context) < interpret(args[1], context);
+    return interpret(answer, context);
+  },
+
+  /*
+   * @function lte
+   * provides less than equal to logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} whether one thing is less than or equal to another
+   */
+  lte: function (input, context) {
+    let args = input.splice(1);
+    
+    if(args.length > 2) {
+      return `Error: can not compare more than 2 args and recieved ${args.length}`;
+    }
+    
+    let answer = {type: 'boolean'};
+    answer.value = interpret(args[0], context) <= interpret(args[1], context);
+    return interpret(answer, context);
+  },
+
+  /*
+   * @function gt
+   * provides greater than logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} whether one thing is greater than another
+   */
+  gt: function (input, context) {
+    let args = input.splice(1);
+    
+    if(args.length > 2) {
+      return `Error: can not compare more than 2 args and recieved ${args.length}`;
+    }
+    
+    let answer = {type: 'boolean'};
+    answer.value = interpret(args[0], context) > interpret(args[1], context);
+    return interpret(answer, context);
+  },
+
+  /*
+   * @function gte
+   * provides greater than equal to logic
+   * @param {identifier[]} list - A list of identifiable types
+   * @param {object} context - the context of a identifier.
+   *
+   * @return {indentifier} whether one thing is greater than or equal to another
+   */
+  gte: function (input, context) {
+    let args = input.splice(1);
+    
+    if(args.length > 2) {
+      return `Error: can not compare more than 2 args and recieved ${args.length}`;
+    }
+    
+    let answer = {type: 'boolean'};
+    answer.value = interpret(args[0], context) >= interpret(args[1], context);
+    return interpret(answer, context);
+  },
+
+  let: function (input, context) {
     let let_cont = input[1].reduce((cur, accum) => {
       accum.scope[cur[0].value] = interpret(cur[1], context);
       return accum;
@@ -174,6 +362,11 @@ const lisp_functions = {
   }
 };
 
+/*
+ * @class Context
+ * allows us to define a type known as context, that gives a param its scope and parent
+ *
+ */
 class Context {
   constructor(scope, parent) {
     this.scope = scope;
@@ -189,7 +382,15 @@ class Context {
   };
 }
 
-const build_logic = (logic, params) => {
+/*
+ * @function build_logic
+ * builds the logic for a function
+ * @param {function} logic - The logic for a function
+ * @param {identifier[]} params - the list of identifiers that are the paremeters for the function. 
+ *
+ * @return {string} the function logic
+ */
+function build_logic (logic, params) {
   //creates deep copy
   let copy = JSON.parse(JSON.stringify(logic));
 
@@ -212,9 +413,17 @@ const build_logic = (logic, params) => {
   return final;
 };
 
-const interpretList = (input, context) => {
+/*
+ * @function interpretList
+ * interprets a lisp list
+ * @param {identifier[]} input - A list of identifiable types.
+ * @param {object} context - the context of a identifier.
+ *
+ * @return the interpretation of a lisp list/funct
+ */
+function interpretList (input, context) {
   const ident_val = input[0].value;
-  console.log('in', input);
+  //console.log('in', input);
   
   if (input.length > 0 && ident_val in lisp_functions) {
     return lisp_functions[ident_val](input, context);
@@ -235,7 +444,15 @@ const interpretList = (input, context) => {
   }
 };
 
-const interpret = (input, context) => {
+/*
+ * @function interpret
+ * interprets a lisp element
+ * @param {identifier} input - an type to be identified
+ * @param {object} context - the context of a identifier.
+ *
+ * @return the interpretation of a lisp element
+ */
+function interpret(input, context) {
   if (context === undefined) {
     return interpret(input, new Context(library));
   } else if (input instanceof Array) {
@@ -244,12 +461,19 @@ const interpret = (input, context) => {
     return context.get(input.value);
   } else if (input.type === "number" || input.type === "string") {
     return input.value;
-  } else if (input.type === "frac") {
-    return `${input.num}/${input.denom}`;
+  } else if (input.type === "boolean") {
+    return input.value;
   }
 };
 
-const categorize = (input) => {
+/*
+ * @function categorize
+ * identifies the type of element in a lisp list
+ * @param {identifier} input an element
+ *
+ * @return {object} containg the type and value of an element
+ */
+function categorize(input) {
   if(!isNaN(parseFloat(input))) {
     return { type: 'number', value: parseFloat(input) };
   } else if (input[0] === '"' && input.slice(-1) === '"') {
@@ -259,7 +483,15 @@ const categorize = (input) => {
   }
 };
 
-const parenthesize = (input, list) => {
+/*
+ * @function parenthesise
+ * makes sure the lisp expression is properly parenthesized 
+ * @param {string} input - the input string
+ * @param {character} list - of characters to keep track
+ *
+ * @return the sub lists within a lisp expression
+ */
+function parenthesize(input, list) {
   if(list === undefined) {
     return parenthesize(input, []);
   } else {
@@ -284,7 +516,14 @@ const parenthesize = (input, list) => {
   }
 };
 
-const tokenize = (input) => {
+/*
+ * @function tokenize
+ * tokenizes the function
+ * @param {string} input - properly parses a string
+ *
+ * @return the parsed string
+ */
+function tokenize(input) {
   
   return input.split('"')
     .map((str, pos) => {
@@ -310,7 +549,14 @@ const tokenize = (input) => {
   
 };
 
-const parse = (input) => {
+/*
+ * @function parse
+ * parses the function
+ * @param {string} input - properly parses a string
+ *
+ * @return the evaluted lisp
+ */
+function parse(input) {
   return parenthesize(tokenize(input));
 };
 
